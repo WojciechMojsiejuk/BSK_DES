@@ -65,11 +65,43 @@ namespace DES
         {
             StringBuilder sb = new StringBuilder();
 
+                while(FileBytes.Length % 64 != 0)
+            {
+               // dodanie bitów
+            }
+            
+
             foreach (byte b in FileBytes)
             {
                 sb.Append(Convert.ToString(b, 2).PadLeft(8, '0'));
             }
             return sb.ToString();
+        }
+
+        public static int[][] tablica = new int[9][];
+
+        public void PermutacjeIP()
+        {
+            var allLines = File.ReadAllLines("permutacja.txt");
+
+            for(int i=0; i<9;i++)
+            {
+                if(i>=allLines.Length)
+                {
+                    break;
+                }
+                var line = allLines[i];
+
+                for(int j = 0; j<8;j++)
+                {
+                    if(j>=line.Length)
+                    {
+                        break;
+                    }
+
+                    tablica[i][j] = line[j];
+                }
+            }
         }
 
     }
