@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace DES
         }
 
         private BinaryMessage binaryMessage;
+        public const int BLOCK_SIZE = 8; // 8 bytes = 64 bits
 
         private void OpenFile(object sender, RoutedEventArgs e)
         {
@@ -38,12 +40,11 @@ namespace DES
             {
                 binaryMessage = new BinaryMessage(openFileDialog.FileName);
                 filepath.Text = binaryMessage.BM_Filepath;
-                binaryMessage.ReadFile();
-                inputFileText.Text = binaryMessage.ToString();
             }
-                
-
+            
         }
+
+        
 
         private void SaveFile(object sender, RoutedEventArgs e)
         {
@@ -61,6 +62,37 @@ namespace DES
                 // Save document
                 string filename = saveFileDialog.FileName;
                 binaryMessage.WriteFile(filename);
+            }
+        }
+
+        private void Cypher_Click(object sender, RoutedEventArgs e)
+        {
+            FileStream stream = new FileStream(binaryMessage.BM_Filepath, FileMode.Open, FileAccess.Read);
+            byte[] block = new byte[BLOCK_SIZE];
+            while (stream.Read(block, 0, BLOCK_SIZE) > 0)
+            {  //as long as this does not return 0, the data in the file hasn't been completely read          
+                System.Diagnostics.Debug.WriteLine(BitConverter.ToString(block));
+                //convert bytes to bits
+                BitArray inputBits = new BitArray(block);
+                BitArray tempBits = DESMethods.Permute(DESMethods.IP, inputBits);
+                BitArray outputBits = DESMethods.Permute(DESMethods.IP_INVERSE, tempBits);
+                if (binaryMessage.OutputBytes == null)
+                {
+                    binaryMessage.OutputBytes = DESMethods.BitArrayToByteConverter(outputBits);
+                }
+                else
+                {
+                    binaryMessage.OutputBytes.Concat(DESMethods.BitArrayToByteConverter(outputBits)).ToArray();
+                }
+            }
+        }
+
+        private void LoadFile(object sender, RoutedEventArgs e)
+        {
+            if(binaryMessage!=null)
+            {
+                binaryMessage.ReadFile();
+                inputFileText.Text = binaryMessage.ToString();
             }
         }
     }

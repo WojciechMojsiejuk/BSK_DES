@@ -57,8 +57,10 @@ namespace DES
 
         public void WriteFile(string filepath)
         {
-            OutputBytes = FileBytes;
-            File.WriteAllBytes(filepath, OutputBytes);
+            if(OutputBytes!=null)
+            {
+                File.WriteAllBytes(filepath, OutputBytes);
+            }
         }
          
         public override string ToString()

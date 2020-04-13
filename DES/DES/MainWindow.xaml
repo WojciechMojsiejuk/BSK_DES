@@ -11,6 +11,7 @@
             <ToolBar DockPanel.Dock="Top">
                 <Button Click="OpenFile" Margin="0,0,0,-0.333" VerticalAlignment="Stretch">Open</Button>
                 <Button Click="SaveFile">Save</Button>
+                <Button Click="LoadFile">Load file</Button>
             </ToolBar>
             <Grid Margin="4">
                 <Grid.ColumnDefinitions>
@@ -21,7 +22,7 @@
                 <GroupBox Header="Input file">
                     <TextBox x:Name="inputFileText" VerticalScrollBarVisibility="Visible" TextWrapping="Wrap"/>
                 </GroupBox>
-      
+
                 <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center"/>
                 <Grid Grid.Column="2">
                     <Grid.ColumnDefinitions>
@@ -39,12 +40,12 @@
                     <Label Grid.Row="1" Margin="4">Key</Label>
                     <TextBox Name="key" Grid.Column="1" Grid.Row="1" Margin="4" />
                     <StackPanel Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Width="auto" Height="30" Margin="20, 0, 20, 0">Cypher</Button>
-                        <Button Width="auto" Height="30" Margin="20, 0, 20, 0">Decypher</Button>
+                        <Button Width="auto" Margin="20, 0, 20, 0" x:Name="Cypher" Click="Cypher_Click">Cypher</Button>
+                        <Button Width="auto" Height="30" Margin="20, 0, 20, 0" x:Name="Decypher">Decypher</Button>
                     </StackPanel>
                     <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Padding="5" HorizontalAlignment="Stretch" Header="Output">
                         <TextBox x:Name="outputFileText">
-                            
+
                         </TextBox>
                     </GroupBox>
 
