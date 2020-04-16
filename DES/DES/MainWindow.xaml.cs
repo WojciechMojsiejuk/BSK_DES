@@ -29,7 +29,8 @@ namespace DES
         }
 
         private BinaryMessage binaryMessage;
-        public const int BLOCK_SIZE = 8; // 8 bytes = 64 bits
+
+        public const int BLOCK_SIZE = 8; // 8 bytes = 64 
 
         private void OpenFile(object sender, RoutedEventArgs e)
         {
@@ -67,6 +68,20 @@ namespace DES
 
         private void Cypher_Click(object sender, RoutedEventArgs e)
         {
+            if(key.Text.Length<=0)
+            {
+                MessageBox.Show("Provided key lenght must be bigger than 0", "Key Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            byte[] Key = Encoding.Default.GetBytes(key.Text);
+             
+            if (Key.Length != 8)
+            {
+                MessageBox.Show("Provided key lenght must be equal to 8 bytes", "Key Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            BitArray[] keys = DESMethods.GenerateKeys(new BitArray(Key));
+
             FileStream stream = new FileStream(binaryMessage.BM_Filepath, FileMode.Open, FileAccess.Read);
             byte[] block = new byte[BLOCK_SIZE];
             while (stream.Read(block, 0, BLOCK_SIZE) > 0)
@@ -74,8 +89,26 @@ namespace DES
                 System.Diagnostics.Debug.WriteLine(BitConverter.ToString(block));
                 //convert bytes to bits
                 BitArray inputBits = new BitArray(block);
-                BitArray tempBits = DESMethods.Permute(DESMethods.IP, inputBits);
-                BitArray outputBits = DESMethods.Permute(DESMethods.IP_INVERSE, tempBits);
+                System.Diagnostics.Debug.WriteLine("INPUT: " + DESMethods.printBinary(inputBits));
+                BitArray tempBits = DESMethods.Permute(DESMethods.IP, inputBits, 64);
+                System.Diagnostics.Debug.WriteLine("IP: " + DESMethods.printBinary(tempBits));
+                //Divide into halfs
+                BitArray leftPart = DESMethods.CopySlice(tempBits, 0, 32);
+                BitArray rightPart = DESMethods.CopySlice(tempBits, 32, 32);
+                System.Diagnostics.Debug.WriteLine("LEFT: " + DESMethods.printBinary(leftPart));
+                System.Diagnostics.Debug.WriteLine("RIGHT: " + DESMethods.printBinary(rightPart));
+                BitArray leftPartPrim = new BitArray(32);
+                BitArray rightPartPrim = new BitArray(32);
+
+                for (int i = 0; i<16; i++)
+                {
+                    leftPartPrim = rightPart;
+                    rightPartPrim = leftPart.Xor(DESMethods.fFunction(rightPart, keys[i]));
+                    leftPart = leftPartPrim;
+                    rightPart = rightPartPrim;
+                }
+                BitArray preOutput = DESMethods.Merge(rightPart, leftPart);
+                BitArray outputBits = DESMethods.Permute(DESMethods.IP_INVERSE, preOutput, 64);
                 if (binaryMessage.OutputBytes == null)
                 {
                     binaryMessage.OutputBytes = DESMethods.BitArrayToByteConverter(outputBits);
