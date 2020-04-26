@@ -61,6 +61,10 @@ namespace DES
             {
                 File.WriteAllBytes(filepath, OutputBytes);
             }
+            else
+            {
+                MessageBox.Show("No changes to save","File not saved", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
          
         public override string ToString()
@@ -68,6 +72,17 @@ namespace DES
             StringBuilder sb = new StringBuilder();
 
             foreach (byte b in FileBytes)
+            {
+                sb.Append(Convert.ToString(b, 2).PadLeft(8, '0'));
+            }
+            return sb.ToString();
+        }
+
+        public string OutputToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (byte b in OutputBytes)
             {
                 sb.Append(Convert.ToString(b, 2).PadLeft(8, '0'));
             }

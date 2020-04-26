@@ -41,7 +41,7 @@
                     <TextBox Name="key" Grid.Column="1" Grid.Row="1" Margin="4" />
                     <StackPanel Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Width="auto" Margin="20, 0, 20, 0" x:Name="Cypher" Click="Cypher_Click">Cypher</Button>
-                        <Button Width="auto" Height="30" Margin="20, 0, 20, 0" x:Name="Decypher">Decypher</Button>
+                        <Button Width="auto" Height="30" Margin="20, 0, 20, 0" x:Name="Decypher" Click="Decypher_Click">Decypher</Button>
                     </StackPanel>
                     <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Padding="5" HorizontalAlignment="Stretch" Header="Output">
                         <TextBox x:Name="outputFileText">

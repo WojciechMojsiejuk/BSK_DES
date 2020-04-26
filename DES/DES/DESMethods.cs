@@ -179,8 +179,6 @@ namespace DES
         {
             if (inputBlock.Length < size)
             {
-                //TODO: implementacja paddingu
-                inputBlock = Padding(inputBlock);
                 System.Diagnostics.Debug.WriteLine("Niepelny blok, dlugosc {0}", inputBlock.Length);
             }
             BitArray result = new BitArray(size);
@@ -192,10 +190,33 @@ namespace DES
             return result;
         }
 
-        private static BitArray Padding(BitArray inputBlock)
+        public static BitArray Padding(int size)
         {
-            throw new NotImplementedException();
+            bool[] array = new bool[size];
+            array[0] = true;
+            for(int i = 1; i<size; i++)
+            {
+                array[i] = false;
+            }
+            BitArray padding = new BitArray(array);
+            System.Diagnostics.Debug.WriteLine("Padding: "+printBinary(padding));
+            return padding;
         }
+        public static BitArray DeletePadding(BitArray block)
+        {
+            for(int i = 0; i<block.Length; i++)
+            {
+                //search until first 1 in block
+                if((bool)block[block.Length - i - 1]==true && i != block.Length - 1)
+                {
+                    return CopySlice(block, 0, block.Length - i - 1);
+                }
+            }
+            //whole block needs to be deleted
+            return null;
+        }
+
+
 
         public static byte[] BitArrayToByteConverter(BitArray bits)
         {
@@ -280,6 +301,7 @@ namespace DES
                 throw new ArgumentException("Key should be 48b, R should be 32b");
             }
             BitArray result = new BitArray(32);
+
             BitArray temp = Permute(E, R, 48);
             temp.Xor(K);
             for(int i = 0; i<8; i++)
