@@ -10,6 +10,7 @@ namespace DES
     public static class DESMethods
     {
         //ARRAYS DEFINITION
+
         public static int[] IP = new int[]
        {
             57, 49, 41, 33, 25, 17, 9, 1,
@@ -139,7 +140,27 @@ namespace DES
                 { 7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8 },
                 { 2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11 }
             } 
-        }; 
+        };
+        public static Dictionary<char, string> HexCharacters = new Dictionary<char, string>
+        {
+            ['0'] = "0000",
+            ['1'] = "0001",
+            ['2'] = "0010",
+            ['3'] = "0011",
+            ['4'] = "0100",
+            ['5'] = "0101",
+            ['6'] = "0110",
+            ['7'] = "0111",
+            ['8'] = "1000",
+            ['9'] = "1001",
+            ['A'] = "1010",
+            ['B'] = "1011",
+            ['C'] = "1100",
+            ['D'] = "1101",
+            ['E'] = "1110",
+            ['F'] = "1111",
+        };
+
         public static int[] getSIndex(BitArray bitArray)
         {
             int[] coords = new int[2] { 0, 0 };
@@ -189,6 +210,26 @@ namespace DES
             }
             return result;
         }
+        public static BitArray PermuteKey(int[] permutationTable, BitArray inputBlock, int size)
+        {
+            if (inputBlock.Length < size)
+            {
+                System.Diagnostics.Debug.WriteLine("Niepelny blok, dlugosc {0}", inputBlock.Length);
+            }
+            BitArray result = new BitArray(inputBlock.Length);
+            for (int i = 0; i < size; i++)
+            {
+                if(i % 7 == 6 )
+                {
+
+                }
+                int index = permutationTable[i];
+                result[i] = inputBlock[index];
+            }
+            return result;
+        }
+
+
 
         public static BitArray Padding(int size)
         {
@@ -227,7 +268,8 @@ namespace DES
 
         public static BitArray[] GenerateKeys(BitArray key)
         {
-            if(key.Length < 64)
+            System.Diagnostics.Debug.WriteLine("ENTERED KEY: " + DESMethods.printBinary(key));
+            if (key.Length < 64)
             {
                 throw new ArgumentException("Key needs to be 64bit array");
             }
@@ -239,20 +281,20 @@ namespace DES
             //Devide output into halfs
             c = CopySlice(pc1Output, 0, 28);
             d = CopySlice(pc1Output, 28, 28);
-            System.Diagnostics.Debug.WriteLine("C0: " + printBinary(c));
-            System.Diagnostics.Debug.WriteLine("D0: " + printBinary(d));
+            //System.Diagnostics.Debug.WriteLine("C0: " + printBinary(c));
+            //System.Diagnostics.Debug.WriteLine("D0: " + printBinary(d));
 
             for(int i = 0; i<keySchedule.Length; i++)
             {
-                System.Diagnostics.Debug.WriteLine("Shift key: " + i);
+                //System.Diagnostics.Debug.WriteLine("Shift key: " + i);
                 for (int j = 0; j<keySchedule[i]; j++)
                 {
                     c = LeftShift(c);
                     d = LeftShift(d);
-                    System.Diagnostics.Debug.WriteLine("C: " + printBinary(c));
-                    System.Diagnostics.Debug.WriteLine("D: " + printBinary(d));
+                    //System.Diagnostics.Debug.WriteLine("C: " + printBinary(c));
+                    //System.Diagnostics.Debug.WriteLine("D: " + printBinary(d));
                 }
-                System.Diagnostics.Debug.WriteLine("Merged: " + printBinary(Merge(c, d)));
+                //System.Diagnostics.Debug.WriteLine("Merged: " + printBinary(Merge(c, d)));
                 keys[i] = Permute(PC2, Merge(c, d), 48);
                 System.Diagnostics.Debug.WriteLine("Key " + i +": " + printBinary(keys[i]));
 

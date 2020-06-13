@@ -68,24 +68,35 @@ namespace DES
                 binaryMessage.WriteFile(filename);
             }
         }
+        public static BitArray StringToBitArray(string hex)
+        {
+            
+            StringBuilder sb = new StringBuilder();
+            foreach (char hexSymbol in hex)
+                sb.Append(DESMethods.HexCharacters[hexSymbol]);
+
+            string bitString = sb.ToString();
+            bool[] result = bitString.Select(s => s == '0' ? false : true).ToArray();
+            return new BitArray(result);
+            
+        }
 
         private void Cypher_Click(object sender, RoutedEventArgs e)
         {
-            outputFileText.Text = "Inicjalizacja";
+            outputFileText.Text = "Inicjalizacja\n";
             if (key.Text.Length<=0)
             {
                 MessageBox.Show("Provided key lenght must be bigger than 0", "Key Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            byte[] Key = Encoding.Default.GetBytes(key.Text);
-             
-            if (Key.Length != 8)
+            BitArray Key = StringToBitArray(key.Text);
+            if (Key.Length != 64)
             {
                 MessageBox.Show("Provided key lenght must be equal to 8 bytes", "Key Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             outputFileText.Text += "Generowanie klucza...\n";
-            BitArray[] keys = DESMethods.GenerateKeys(new BitArray(Key));
+            BitArray[] keys = DESMethods.GenerateKeys(Key);
             outputFileText.Text += "Wygenerowano klucz\n";
             outputFileText.Text += "Szyfrowanie wiadomości...\n";
             FileStream stream = new FileStream(binaryMessage.BM_Filepath, FileMode.Open, FileAccess.Read);
@@ -172,21 +183,21 @@ namespace DES
 
         private void Decypher_Click(object sender, RoutedEventArgs e)
         {
-            outputFileText.Text = "Inicjalizacja";
+            outputFileText.Text = "Inicjalizacja\n";
             if (key.Text.Length <= 0)
             {
                 MessageBox.Show("Provided key lenght must be bigger than 0", "Key Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            byte[] Key = Encoding.Default.GetBytes(key.Text);
+            BitArray Key = StringToBitArray(key.Text);
 
-            if (Key.Length != 8)
+            if (Key.Length != 64)
             {
                 MessageBox.Show("Provided key lenght must be equal to 8 bytes", "Key Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             outputFileText.Text += "Generowanie klucza...\n";
-            BitArray[] keys = DESMethods.GenerateKeys(new BitArray(Key));
+            BitArray[] keys = DESMethods.GenerateKeys(Key);
             outputFileText.Text += "Wygenerowano klucz\n";
             outputFileText.Text += "Rozszyfrowanie wiadomości...\n";
 
