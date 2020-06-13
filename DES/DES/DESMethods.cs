@@ -198,10 +198,6 @@ namespace DES
 
         public static BitArray Permute(int[] permutationTable, BitArray inputBlock, int size)
         {
-            if (inputBlock.Length < size)
-            {
-                System.Diagnostics.Debug.WriteLine("Niepelny blok, dlugosc {0}", inputBlock.Length);
-            }
             BitArray result = new BitArray(size);
             for (int i = 0; i < size; i++)
             {
@@ -228,8 +224,6 @@ namespace DES
             }
             return result;
         }
-
-
 
         public static BitArray Padding(int size)
         {
@@ -264,6 +258,19 @@ namespace DES
             byte[] results = new byte[(bits.Length - 1) / 8 + 1];
             bits.CopyTo(results, 0);
             return results;
+        }
+
+        public static BitArray revertBitArray(BitArray block)
+        {
+            BitArray revertedBlock = new BitArray(block.Length);
+            for(int i = 0; i<8;i++)
+            {
+                for(int j = 0; j<8; j++)
+                {
+                    revertedBlock[(8 * i) + j] = block[(8 * i) + (7 - j)];
+                }
+            }
+            return revertedBlock;
         }
 
         public static BitArray[] GenerateKeys(BitArray key)
@@ -345,13 +352,21 @@ namespace DES
             BitArray result = new BitArray(32);
 
             BitArray temp = Permute(E, R, 48);
+            //System.Diagnostics.Debug.WriteLine("After extend: " + DESMethods.printBinary(temp));
             temp.Xor(K);
-            for(int i = 0; i<8; i++)
+            //System.Diagnostics.Debug.WriteLine("After xor: " + DESMethods.printBinary(temp));
+            for (int i = 0; i<8; i++)
             {
                 BitArray inputS = CopySlice(temp, 6*i, 6);
+                //System.Diagnostics.Debug.WriteLine("S" + (i + 1).ToString() + ": " + DESMethods.printBinary(inputS));
+
                 int[] coords = getSIndex(inputS);
-                BitArray outputS = new BitArray(new int[] { S[i, coords[0], coords[1]] });
-                if(i==0)
+                //System.Diagnostics.Debug.WriteLine(coords[0].ToString()+" "+ coords[1].ToString());
+                int decimalValue = S[i, coords[0], coords[1]];
+                //System.Diagnostics.Debug.WriteLine("VALUE: " + decimalValue.ToString());
+                bool[] boolOutput = ConvertDecimalToFourBits(decimalValue);
+                BitArray outputS = new BitArray(boolOutput);
+                if (i==0)
                 {
                     result = outputS;
                 }
@@ -360,7 +375,21 @@ namespace DES
                     result = Merge(result, outputS);
                 }
             }
+            //System.Diagnostics.Debug.WriteLine("RESULT: " + DESMethods.printBinary(result));
+            //System.Diagnostics.Debug.WriteLine("fFunction: " + DESMethods.printBinary(Permute(P, result, 32)));
             return Permute(P, result, 32);
+        }
+        public static bool[] ConvertDecimalToFourBits(int decimalValue)
+        {
+            if (decimalValue > 15)
+                throw new Exception("Paremeter must be less than 15");
+            BitArray bitArray = new BitArray(new int[] { decimalValue });
+            List<bool> result = new List<bool>();
+            for (int i = 0; i < bitArray.Length; i++)
+            {
+                result.Add(bitArray[i]);
+            }
+            return result.Take(4).Reverse().ToArray();
         }
 
         public static string printBinary(BitArray value)

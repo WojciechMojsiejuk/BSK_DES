@@ -128,6 +128,7 @@ namespace DES
                         stream.Read(block, 0, LastBlockBytesNumber);
                         BitArray additionalBlock = DESMethods.Padding(64 - (8 * LastBlockBytesNumber));
                         inputBits = new BitArray(block);
+                        inputBits = DESMethods.revertBitArray(inputBits);
                         inputBits = DESMethods.Merge(DESMethods.CopySlice(inputBits, 0, 8 * LastBlockBytesNumber), additionalBlock);
                     }
                 }
@@ -136,6 +137,7 @@ namespace DES
                     stream.Read(block, 0, BLOCK_SIZE);
                     //convert bytes to bits
                     inputBits = new BitArray(block);
+                    inputBits = DESMethods.revertBitArray(inputBits);
                 }
                 //as long as this does not return 0, the data in the file hasn't been completely read          
                 System.Diagnostics.Debug.WriteLine(BitConverter.ToString(block));
@@ -146,8 +148,8 @@ namespace DES
                 //Divide into halfs
                 BitArray leftPart = DESMethods.CopySlice(tempBits, 0, 32);
                 BitArray rightPart = DESMethods.CopySlice(tempBits, 32, 32);
-                System.Diagnostics.Debug.WriteLine("LEFT: " + DESMethods.printBinary(leftPart));
-                System.Diagnostics.Debug.WriteLine("RIGHT: " + DESMethods.printBinary(rightPart));
+                //System.Diagnostics.Debug.WriteLine("LEFT: " + DESMethods.printBinary(leftPart));
+                //System.Diagnostics.Debug.WriteLine("RIGHT: " + DESMethods.printBinary(rightPart));
                 BitArray leftPartPrim = new BitArray(32);
                 BitArray rightPartPrim = new BitArray(32);
 
@@ -155,11 +157,15 @@ namespace DES
                 {
                     leftPartPrim = rightPart;
                     rightPartPrim = leftPart.Xor(DESMethods.fFunction(rightPart, keys[i]));
+                    //System.Diagnostics.Debug.WriteLine("RIGHT after XOR: " + DESMethods.printBinary(rightPartPrim));
                     leftPart = leftPartPrim;
                     rightPart = rightPartPrim;
                 }
                 BitArray preOutput = DESMethods.Merge(rightPart, leftPart);
+                System.Diagnostics.Debug.WriteLine("PRE OUT: " + DESMethods.printBinary(preOutput));
                 BitArray outputBits = DESMethods.Permute(DESMethods.IP_INVERSE, preOutput, 64);
+                System.Diagnostics.Debug.WriteLine("OUT: " + DESMethods.printBinary(outputBits));
+                outputBits = DESMethods.revertBitArray(outputBits);
                 if (binaryMessage.OutputBytes == null)
                 {
                     binaryMessage.OutputBytes = DESMethods.BitArrayToByteConverter(outputBits);
@@ -215,15 +221,15 @@ namespace DES
                 
                 //as long as this does not return 0, the data in the file hasn't been completely read          
                 System.Diagnostics.Debug.WriteLine(BitConverter.ToString(block));
-                System.Diagnostics.Debug.WriteLine("INPUT: " + DESMethods.printBinary(inputBits));
+                //System.Diagnostics.Debug.WriteLine("INPUT: " + DESMethods.printBinary(inputBits));
 
                 BitArray tempBits = DESMethods.Permute(DESMethods.IP, inputBits, 64);
-                System.Diagnostics.Debug.WriteLine("IP: " + DESMethods.printBinary(tempBits));
+                //System.Diagnostics.Debug.WriteLine("IP: " + DESMethods.printBinary(tempBits));
                 //Divide into halfs
                 BitArray leftPart = DESMethods.CopySlice(tempBits, 0, 32);
                 BitArray rightPart = DESMethods.CopySlice(tempBits, 32, 32);
-                System.Diagnostics.Debug.WriteLine("LEFT: " + DESMethods.printBinary(leftPart));
-                System.Diagnostics.Debug.WriteLine("RIGHT: " + DESMethods.printBinary(rightPart));
+                //System.Diagnostics.Debug.WriteLine("LEFT: " + DESMethods.printBinary(leftPart));
+                //System.Diagnostics.Debug.WriteLine("RIGHT: " + DESMethods.printBinary(rightPart));
                 BitArray leftPartPrim = new BitArray(32);
                 BitArray rightPartPrim = new BitArray(32);
 
