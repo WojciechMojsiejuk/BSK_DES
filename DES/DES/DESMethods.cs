@@ -240,12 +240,13 @@ namespace DES
         public static BitArray DeletePadding(BitArray block)
         {
             System.Diagnostics.Debug.WriteLine("BEFORE DELETING: " + printBinary(block));
-            for (int i = 0; i<block.Length; i++)
+
+            for (int i = block.Length-1; i>=0; i--)
             {
                 //search until first 1 in block
-                if((bool)block[block.Length - i - 1]==true && i != block.Length - 1)
+                if((bool)block[i]==true && i != 7)
                 {
-                    return CopySlice(block, 0, block.Length - i - 1);
+                    return CopySlice(block, 0, i - 8);
                 }
             }
             //whole block needs to be deleted
@@ -261,21 +262,14 @@ namespace DES
             return results;
         }
 
-        public static BitArray revertBitArray(BitArray block, int bytesToRevert)
+        public static BitArray revertBitArray(BitArray block)
         {
             BitArray revertedBlock = new BitArray(block.Length);
-            for(int i = 0; i<bytesToRevert;i++)
+            for(int i = 0; i<8;i++)
             {
                 for(int j = 0; j<8; j++)
                 {
                     revertedBlock[(8 * i) + j] = block[(8 * i) + (7 - j)];
-                }
-            }
-            for (int i = bytesToRevert; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    revertedBlock[(8 * i) + j] = block[(8 * i) + j];
                 }
             }
             return revertedBlock;

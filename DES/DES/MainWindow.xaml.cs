@@ -128,7 +128,7 @@ namespace DES
                         stream.Read(block, 0, LastBlockBytesNumber);
                         BitArray additionalBlock = DESMethods.Padding(64 - (8 * LastBlockBytesNumber));
                         inputBits = new BitArray(block);
-                        inputBits = DESMethods.revertBitArray(inputBits, LastBlockBytesNumber);
+                        inputBits = DESMethods.revertBitArray(inputBits);
                         inputBits = DESMethods.Merge(DESMethods.CopySlice(inputBits, 0, 8 * LastBlockBytesNumber), additionalBlock);
                     }
                 }
@@ -137,7 +137,7 @@ namespace DES
                     stream.Read(block, 0, BLOCK_SIZE);
                     //convert bytes to bits
                     inputBits = new BitArray(block);
-                    inputBits = DESMethods.revertBitArray(inputBits, BLOCK_SIZE);
+                    inputBits = DESMethods.revertBitArray(inputBits);
                 }
                 //as long as this does not return 0, the data in the file hasn't been completely read          
                 System.Diagnostics.Debug.WriteLine(BitConverter.ToString(block));
@@ -165,21 +165,7 @@ namespace DES
                 System.Diagnostics.Debug.WriteLine("PRE OUT: " + DESMethods.printBinary(preOutput));
                 BitArray outputBits = DESMethods.Permute(DESMethods.IP_INVERSE, preOutput, 64);
                 System.Diagnostics.Debug.WriteLine("OUT: " + DESMethods.printBinary(outputBits));
-                if (indexOfBlock == NumberOfBlocks - 1)
-                {
-                    if(LastBlockBytesNumber == 0)
-                    {
-                        outputBits = DESMethods.revertBitArray(outputBits, BLOCK_SIZE);
-                    }
-                    else
-                    {
-                        outputBits = DESMethods.revertBitArray(outputBits, LastBlockBytesNumber);
-                    }
-                }
-                else
-                {
-                    outputBits = DESMethods.revertBitArray(outputBits, BLOCK_SIZE);
-                }
+                outputBits = DESMethods.revertBitArray(outputBits);
                 if (binaryMessage.OutputBytes == null)
                 {
                     binaryMessage.OutputBytes = DESMethods.BitArrayToByteConverter(outputBits);
@@ -233,7 +219,7 @@ namespace DES
                 //convert bytes to bits
                 inputBits = new BitArray(block);
                 //System.Diagnostics.Debug.WriteLine(BitConverter.ToString(block));
-                inputBits = DESMethods.revertBitArray(inputBits, BLOCK_SIZE);
+                inputBits = DESMethods.revertBitArray(inputBits);
                 //System.Diagnostics.Debug.WriteLine("INPUT: " + DESMethods.printBinary(inputBits));
 
                 BitArray tempBits = DESMethods.Permute(DESMethods.IP, inputBits, 64);
@@ -255,17 +241,13 @@ namespace DES
                 }
                 BitArray preOutput = DESMethods.Merge(rightPart, leftPart);
                 BitArray outputBits = DESMethods.Permute(DESMethods.IP_INVERSE, preOutput, 64);
-                
+                outputBits = DESMethods.revertBitArray(outputBits);
                 if (indexOfBlock == NumberOfBlocks - 1)
                 {
                     //delete padding
                     outputBits = DESMethods.DeletePadding(outputBits);
                     if (outputBits == null)
                         continue;
-                }
-                else
-                {
-                    outputBits = DESMethods.revertBitArray(outputBits, BLOCK_SIZE);
                 }
                 if (binaryMessage.OutputBytes == null)
                 {
